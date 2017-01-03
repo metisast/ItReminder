@@ -12,14 +12,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import kz.yankee.itreminder.adapter.CurrentTaskAdapter;
 import kz.yankee.itreminder.adapter.TabAdapter;
 import kz.yankee.itreminder.dialog.AddingTaskDialogFragment;
+import kz.yankee.itreminder.fragment.CurrentTaskFragment;
+import kz.yankee.itreminder.fragment.DoneTaskFragment;
 import kz.yankee.itreminder.fragment.SplashFragment;
+import kz.yankee.itreminder.model.ModelTask;
 
 public class MainActivity extends AppCompatActivity implements AddingTaskDialogFragment.AddingTaskListener{
 
     android.app.FragmentManager fragmentManager;
     PreferenceHelper preferenceHelper;
+    TabAdapter tabAdapter;
+
+    CurrentTaskFragment currentTaskFragment;
+    DoneTaskFragment doneTaskFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements AddingTaskDialogF
 
         // Контейнер для отображения фрагментов
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        TabAdapter tabAdapter = new TabAdapter(fragmentManager, 2);
+        tabAdapter = new TabAdapter(fragmentManager, 2);
 
         viewPager.setAdapter(tabAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -119,6 +127,10 @@ public class MainActivity extends AppCompatActivity implements AddingTaskDialogF
             }
         });
 
+        // Определяем фрагменты
+        currentTaskFragment = (CurrentTaskFragment) tabAdapter.getItem(TabAdapter.CURRENT_TASK_FRAGMENT_POSITION);
+        doneTaskFragment = (DoneTaskFragment) tabAdapter.getItem(TabAdapter.DONE_TASK_FRAGMENT_POSITION);
+
         // Слушатель для создания новой задачи
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -134,8 +146,8 @@ public class MainActivity extends AppCompatActivity implements AddingTaskDialogF
 
     // Слушатели для отлова состояний задач
     @Override
-    public void onTaskAdded() {
-        Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show();
+    public void onTaskAdded(ModelTask newTask) {
+        currentTaskFragment.addTask(newTask);
     }
 
     @Override

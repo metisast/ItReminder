@@ -20,6 +20,7 @@ import java.util.Calendar;
 
 import kz.yankee.itreminder.R;
 import kz.yankee.itreminder.Utils;
+import kz.yankee.itreminder.model.ModelTask;
 
 /**
  * Создаем диалоговое окно для постановки задачи
@@ -31,7 +32,7 @@ public class AddingTaskDialogFragment extends DialogFragment {
 
     // Реализуем интерфейсы для отлова состояния из activity
     public interface AddingTaskListener {
-        void onTaskAdded();
+        void onTaskAdded(ModelTask newTask);
         void onTaskAddingCancel();
     }
 
@@ -74,6 +75,10 @@ public class AddingTaskDialogFragment extends DialogFragment {
 
         builder.setView(container);
 
+        final ModelTask task = new ModelTask();
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 1);
+
         // Запускаем диалоговое окно для выбора даты
         etDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,10 +90,11 @@ public class AddingTaskDialogFragment extends DialogFragment {
                 DialogFragment datePickerFragment = new DatePickerFragment(){
                     // Устанавливаем выбранные дату пользователем в текстовое поле
                     @Override
-                    public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfYear) {
-                        Calendar dateCalendar = Calendar.getInstance();
-                        dateCalendar.set(year, monthOfYear, dayOfYear);
-                        etDate.setText(Utils.getDate(dateCalendar.getTimeInMillis()));
+                    public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                        calendar.set(Calendar.YEAR, year);
+                        calendar.set(Calendar.MONTH, monthOfYear);
+                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        etDate.setText(Utils.getDate(calendar.getTimeInMillis()));
                     }
 
                     // Отменяем диалог
@@ -114,9 +120,10 @@ public class AddingTaskDialogFragment extends DialogFragment {
                     // Устанавливаем выбранное время пользователем в текстовое поле
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-                        Calendar timeCalendar = Calendar.getInstance();
-                        timeCalendar.set(0, 0, 0, hourOfDay, minute);
-                        etTime.setText(Utils.getTime(timeCalendar.getTimeInMillis()));
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        calendar.set(Calendar.SECOND, 0);
+                        etTime.setText(Utils.getTime(calendar.getTimeInMillis()));
                     }
                     // Отменяем диалог
                     @Override
@@ -133,8 +140,12 @@ public class AddingTaskDialogFragment extends DialogFragment {
         builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                task.setTitle(etTitle.getText().toString());
+                if(etDate.length() != 0 || etTime.length() != 0){
+                    task.setDate(calendar.getTimeInMillis());
+                }
                 // Говорим MainActivity что произошло событие
-                addingTaskListener.onTaskAdded();
+                addingTaskListener.onTaskAdded(task);
                 dialogInterface.dismiss();
             }
         });

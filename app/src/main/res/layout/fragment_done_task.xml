@@ -4,12 +4,14 @@
     android:layout_height="match_parent"
     tools:context="kz.yankee.itreminder.fragment.DoneTaskFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/done_task"
-        android:layout_gravity="center"
-        android:textSize="36sp" />
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rvDoneTask"
+        android:scrollbars="vertical"
+        android:clipToPadding="false"
+        android:layout_marginBottom="88dp">
+
+    </android.support.v7.widget.RecyclerView>
 
 </FrameLayout>
