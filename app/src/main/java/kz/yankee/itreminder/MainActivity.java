@@ -18,16 +18,19 @@ import kz.yankee.itreminder.dialog.AddingTaskDialogFragment;
 import kz.yankee.itreminder.fragment.CurrentTaskFragment;
 import kz.yankee.itreminder.fragment.DoneTaskFragment;
 import kz.yankee.itreminder.fragment.SplashFragment;
+import kz.yankee.itreminder.fragment.TaskFragment;
 import kz.yankee.itreminder.model.ModelTask;
 
-public class MainActivity extends AppCompatActivity implements AddingTaskDialogFragment.AddingTaskListener{
+public class MainActivity extends AppCompatActivity
+        implements AddingTaskDialogFragment.AddingTaskListener,
+        CurrentTaskFragment.OnTaskDoneListener, DoneTaskFragment.OnTaskRestoreListener{
 
     android.app.FragmentManager fragmentManager;
     PreferenceHelper preferenceHelper;
     TabAdapter tabAdapter;
 
-    CurrentTaskFragment currentTaskFragment;
-    DoneTaskFragment doneTaskFragment;
+    TaskFragment currentTaskFragment;
+    TaskFragment doneTaskFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,5 +156,15 @@ public class MainActivity extends AppCompatActivity implements AddingTaskDialogF
     @Override
     public void onTaskAddingCancel() {
         Toast.makeText(this, "Task adding cancel", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onTaskDone(ModelTask task) {
+        doneTaskFragment.addTask(task);
+    }
+
+    @Override
+    public void onTaskRestore(ModelTask task) {
+        currentTaskFragment.addTask(task);
     }
 }
